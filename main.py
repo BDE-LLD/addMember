@@ -24,17 +24,28 @@ def parse_args(argv):
     return logins
 
 
+def check_users(users: list[ftapi.User], logins: list[str]):
+    print("Check if the following users are active students:")
+    loginsNotFound = [l for l in logins if l not in [u.login for u in users]]
+    if len(loginsNotFound) > 0:
+        print("❌ The following logins were not found: " + ", ".join(loginsNotFound))
+    userNonActive = [u.login for u in users if u.active == False]
+    if len(userNonActive) > 0:
+        print("❌ The following users are not active: " + ", ".join(userNonActive))
+
+    if len(users) != 0:
+        print("✅ Found " + str(len(users)) + " users")
+    else:
+        print("❌ No user found")
+        exit(1)
+
+
 def main():
     logins = parse_args(sys.argv)
     ftClient = ftapi.FtClient(ftCLIENT_ID, ftCLIENT_SECRET)
     ftClient.setAccessToken()
     ftUsers = ftClient.getUsers(logins)
-
-    print("Check if the following users are active students:")
-    loginsNotFound = [l for l in logins if l not in [u.login for u in ftUsers]]
-    if len(loginsNotFound) > 0:
-        print("❌ The following logins were not found: " + ", ".join(loginsNotFound))
-        sys.exit(1)
+    check_users(ftUsers, logins)
 
 
 if __name__ == "__main__":
