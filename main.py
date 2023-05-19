@@ -29,8 +29,12 @@ def main():
     ftClient = ftapi.FtClient(ftCLIENT_ID, ftCLIENT_SECRET)
     ftClient.setAccessToken()
     ftUsers = ftClient.getUsers(logins)
-    for user in ftUsers:
-        print(user.displayname, user.login, user.email)
+
+    print("Check if the following users are active students:")
+    loginsNotFound = [l for l in logins if l not in [u.login for u in ftUsers]]
+    if len(loginsNotFound) > 0:
+        print("❌ The following logins were not found: " + ", ".join(loginsNotFound))
+        sys.exit(1)
 
 
 if __name__ == "__main__":
