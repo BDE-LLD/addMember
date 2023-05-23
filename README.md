@@ -11,9 +11,9 @@ At the moment it will only check if the students have an active cursus.
 ## TODO
 
 - [x] Check the logins
-- [ ] Create a user per login [(doc)](https://developers.google.com/admin-sdk/directory/v1/guides/manage-users)
+- [x] Create a user per login [(doc)](https://developers.google.com/admin-sdk/directory/v1/guides/manage-users)
 - [ ] Add the new users to the `actifs` group
-- [ ] Send a mail to the new users to welcom them [(doc)](https://developers.google.com/gmail/api/reference/rest/v1/users.messages/send)
+- [x] Send a mail to the new users to welcom them [(doc)](https://developers.google.com/gmail/api/reference/rest/v1/users.messages/send)
   - The mail must contain :
     - Temp password
     - Mail adress
