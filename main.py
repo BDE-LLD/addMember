@@ -5,8 +5,11 @@
 # This script is for adding new member to the BDE
 # Give it a list of login
 
-import sys
 import ftapi
+import gapi
+
+from email.message import EmailMessage
+import sys
 import os
 from dotenv import load_dotenv
 
@@ -41,11 +44,54 @@ def check_users(users: list[ftapi.User], logins: list[str]):
 
 
 def main():
-    logins = parse_args(sys.argv)
-    ftClient = ftapi.FtClient(ftCLIENT_ID, ftCLIENT_SECRET)
-    ftClient.setAccessToken()
-    ftUsers = ftClient.getUsers(logins)
-    check_users(ftUsers, logins)
+    try:
+        logins = parse_args(sys.argv)
+        ftClient = ftapi.FtClient(ftCLIENT_ID, ftCLIENT_SECRET)
+        ftClient.setAccessToken()
+        ftUsers = ftClient.getUsers(logins)
+        check_users(ftUsers, logins)
+
+        creds = gapi.creds()
+        admin = gapi.getAdminService(creds=creds)
+        gmail = gapi.getGmailService(creds=creds)
+        for user in ftUsers:
+            print(user.displayname, user.login, user.email)
+            guser = gapi.User(
+                name=gapi.UserName(
+                    user.first_name,
+                    user.last_name,
+                    user.displayname,
+                ),
+                password=gapi.generatePassword(),
+                primaryEmail=user.login + "@bde42.fr",
+                recoveryEmail=user.email,
+                changePasswordAtNextLogin=True,
+            )
+
+            guser.insert(admin)
+
+            message = EmailMessage()
+            message["To"] = guser.recoveryEmail
+            message["From"] = "service-info@bde42.fr"
+            message["Subject"] = "Welcome to the BDE LLD!"
+            message["content-type"] = "text/html"
+
+            message.set_content(
+                f"""
+One dumb user has been created:
+    - First name: {guser.name.givenName}
+    - Last name: {guser.name.familyName}
+    - Display name: {guser.name.displayName}
+    - Primary email: {guser.primaryEmail}
+    - Recovery email: {guser.recoveryEmail}
+    - Password: {guser.password}
+    - Change password at next login: {guser.changePasswordAtNextLogin}
+"""
+            )
+            gapi.sendGmail(gmail, message)
+    except Exception as e:
+        print(e)
+        exit(1)
 
 
 if __name__ == "__main__":
