@@ -58,8 +58,8 @@ def main():
             print(user.displayname, user.login, user.email)
             guser = gapi.User(
                 name=gapi.UserName(
-                    user.first_name,
                     user.last_name,
+                    user.first_name,
                     user.displayname,
                 ),
                 password=gapi.generatePassword(),
@@ -78,7 +78,8 @@ def main():
 
             message.set_content(
                 f"""
-One dumb user has been created:
+
+Hi {guser.name.givenName}! Welcome to the BDE LLD!
     - First name: {guser.name.givenName}
     - Last name: {guser.name.familyName}
     - Display name: {guser.name.displayName}
@@ -86,6 +87,8 @@ One dumb user has been created:
     - Recovery email: {guser.recoveryEmail}
     - Password: {guser.password}
     - Change password at next login: {guser.changePasswordAtNextLogin}
+
+You can follow the BDE calendar here https://calendar.google.com/calendar/u/1?cid=Y19uMDdiZGEzczA5aHFlZ24xZjF2dnZsaGMza0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t
 """
             )
             gapi.sendGmail(gmail, message)
